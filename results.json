@@ -1,0 +1,22 @@
+{
+  "dataset": {
+    "name": "Phishing Websites Dataset (Vrbancic, Fister, Podgorelec, 2020)",
+    "total_urls": 88647,
+    "legitimate": 58000,
+    "phishing": 30647
+  },
+  "iteration_1_baseline": {
+    "accuracy": 0.9047,
+    "precision": 0.8073,
+    "recall": 0.9514,
+    "f1": 0.8734,
+    "roc_auc": 0.972
+  },
+  "iteration_2_refined": {
+    "accuracy": 0.9663,
+    "precision": 0.9366,
+    "recall": 0.9682,
+    "f1": 0.9521,
+    "roc_auc": 0.9949
+  }
+}
