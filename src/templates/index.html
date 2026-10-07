@@ -3,30 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FalconDefuser // Enterprise Threat Intelligence Console</title>
+  <title>SOC Threat Console // Malicious Link Defuser</title>
+  <!-- Google Fonts: JetBrains Mono for monospace data -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --soc-bg: #070D1E;
-      --soc-card: #0E1838;
-      --soc-card-border: #1B2E60;
-      --soc-navy: #1B2A5B;
-      --soc-navy-light: #243B7A;
-      --soc-cyan: #00F2FE;
-      --soc-blue: #3A86FF;
-      --soc-safe: #00E676;
-      --soc-safe-bg: rgba(0, 230, 118, 0.12);
-      --soc-safe-border: #00E676;
-      --soc-danger: #FF1744;
-      --soc-danger-bg: rgba(255, 23, 68, 0.14);
-      --soc-danger-border: #FF1744;
-      --soc-warning: #FFB300;
-      --soc-warning-bg: rgba(255, 179, 0, 0.14);
-      --soc-defused: #00E5FF;
-      --soc-defused-bg: rgba(0, 229, 255, 0.12);
-      --soc-defused-border: #00E5FF;
-      --soc-text: #EDF2F7;
-      --soc-text-dim: #94A3B8;
-      --soc-mono: "SF Mono", "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      --bg-dark: #0B0E14;
+      --panel-bg: #161B22;
+      --panel-border: #21262D;
+      --panel-border-focus: #30363D;
+      --text-main: #C9D1D9;
+      --text-muted: #8B949E;
+      --text-bright: #F0F6FC;
+      
+      --threat-red: #FF4136;
+      --threat-red-bg: rgba(255, 65, 54, 0.1);
+      --threat-red-border: #80201A;
+
+      --safe-green: #00E5A0;
+      --safe-green-bg: rgba(0, 229, 160, 0.08);
+      --safe-green-border: #006647;
+
+      --warning-amber: #D97706;
+      --warning-amber-bg: rgba(217, 119, 6, 0.1);
+      --warning-amber-border: #78350F;
+
+      --font-body: Calibri, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
     }
 
     * {
@@ -36,39 +42,29 @@
     }
 
     body {
-      background-color: var(--soc-bg);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(27, 42, 91, 0.4) 0%, transparent 75%),
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 36px 36px, 36px 36px;
-      color: var(--soc-text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 24px 16px 80px 16px;
+      padding: 0;
+      align-items: stretch;
     }
 
-    .container {
-      width: 100%;
-      max-width: 960px;
-    }
-
-    /* Top Navigation & Status Bar */
+    /* Top Console Status Bar */
     .top-telemetry-bar {
+      background: #0D1117;
+      border-bottom: 1px solid var(--panel-border);
+      padding: 8px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 20px;
-      background: rgba(14, 24, 56, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--soc-card-border);
-      border-radius: 8px 8px 0 0;
-      font-family: var(--soc-mono);
-      font-size: 11.5px;
-      color: var(--soc-cyan);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
     .telemetry-left {
@@ -77,157 +73,193 @@
       gap: 12px;
     }
 
-    .pulse-orb {
+    .status-indicator {
+      display: inline-block;
       width: 8px;
       height: 8px;
-      border-radius: 50%;
-      background-color: var(--soc-safe);
-      box-shadow: 0 0 10px var(--soc-safe);
-      animation: pulse 2s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.7; }
-      50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 16px var(--soc-safe); }
-      100% { transform: scale(0.9); opacity: 0.7; }
+      background-color: var(--safe-green);
+      border-radius: 2px;
     }
 
     .telemetry-right {
       display: flex;
-      gap: 16px;
-      color: var(--soc-text-dim);
+      gap: 20px;
     }
 
-    .telemetry-highlight {
-      color: #FFFFFF;
-      font-weight: 600;
+    .telemetry-item span {
+      color: var(--text-bright);
     }
 
-    /* Main Console Header */
+    /* Main Console Wrapper */
+    .console-wrapper {
+      max-width: 1100px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 0 16px;
+      flex: 1;
+    }
+
+    /* Header Section */
     .console-header {
-      background: linear-gradient(180deg, var(--soc-navy) 0%, #111E44 100%);
-      border-left: 1px solid var(--soc-card-border);
-      border-right: 1px solid var(--soc-card-border);
-      padding: 28px 24px 24px 24px;
-      position: relative;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-bottom: none;
+      padding: 20px 24px;
+      text-align: left;
     }
 
-    .console-header::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--soc-cyan), transparent);
-    }
-
-    .header-layout {
+    .header-title-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      align-items: flex-start;
       gap: 16px;
     }
 
     .header-title-box h1 {
-      font-size: 25px;
-      font-weight: 800;
-      letter-spacing: -0.4px;
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: -0.3px;
     }
 
     .header-title-box p {
-      font-size: 13.5px;
-      color: var(--soc-text-dim);
-      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    .header-meta-tags {
+    .header-tags {
       display: flex;
       gap: 8px;
     }
 
-    .meta-chip {
-      background: rgba(0, 242, 254, 0.08);
-      border: 1px solid rgba(0, 242, 254, 0.35);
-      color: var(--soc-cyan);
-      font-family: var(--soc-mono);
+    .console-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 8px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+    }
+
+    /* Continuous Output Panel */
+    .continuous-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 24px;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
       font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: block;
     }
 
-    /* Main Command Panel */
-    .main-panel {
-      background: var(--soc-card);
-      border: 1px solid var(--soc-card-border);
-      border-top: none;
-      border-radius: 0 0 10px 10px;
-      padding: 26px 24px 36px 24px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .form-group {
-      margin-bottom: 22px;
-    }
-
-    .field-label {
+    /* Input Group */
+    .input-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-family: var(--soc-mono);
-      text-transform: uppercase;
-      color: var(--soc-text-dim);
-      letter-spacing: 0.8px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
+      gap: 0;
+      margin-bottom: 16px;
     }
 
     .input-prefix {
-      position: absolute;
-      left: 16px;
-      color: var(--soc-cyan);
-      font-family: var(--soc-mono);
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      border-right: none;
+      padding: 12px 14px;
+      font-family: var(--font-mono);
       font-size: 13px;
-      font-weight: 700;
-      pointer-events: none;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      user-select: none;
     }
 
     input[type="text"] {
-      width: 100%;
-      background: #070D1E;
-      border: 1.5px solid var(--soc-card-border);
-      border-radius: 6px;
-      padding: 15px 14px 15px 96px;
-      color: #FFFFFF;
-      font-family: var(--soc-mono);
-      font-size: 14.5px;
-      transition: all 0.25s ease;
+      flex: 1;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 12px 14px;
+      color: var(--text-bright);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      outline: none;
     }
 
     input[type="text"]:focus {
-      outline: none;
-      border-color: var(--soc-cyan);
-      box-shadow: 0 0 18px rgba(0, 242, 254, 0.25);
-      background: #0B142E;
+      border-color: var(--panel-border-focus);
+      background: #11161D;
+    }
+
+    /* Model Selector Grid */
+    .engine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .engine-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .engine-card {
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .engine-card.selected {
+      border-color: var(--text-main);
+      background: #121820;
+    }
+
+    .engine-card input[type="radio"] {
+      margin-top: 3px;
+      accent-color: var(--text-bright);
+      cursor: pointer;
+    }
+
+    .engine-card-text .title {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+
+    .engine-card-text .desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    /* Notice box */
+    .soc-notice {
+      display: none;
+      margin-bottom: 20px;
+      padding: 10px 14px;
+      background: var(--warning-amber-bg);
+      border: 1px solid var(--warning-amber-border);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #FCD34D;
+      text-align: left;
     }
 
     /* Quick Scenarios Bar */
     .scenarios-bar {
-      margin-top: 12px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -235,150 +267,61 @@
     }
 
     .scenarios-label {
+      font-family: var(--font-mono);
       font-size: 11px;
-      font-family: var(--soc-mono);
-      color: var(--soc-text-dim);
-      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
     .scenario-btn {
-      background: rgba(27, 46, 96, 0.4);
-      border: 1px solid rgba(58, 134, 255, 0.3);
-      color: #CBD5E1;
-      padding: 5px 11px;
-      border-radius: 4px;
-      font-size: 11.5px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 4px 10px;
+      font-size: 11px;
       cursor: pointer;
-      font-family: var(--soc-mono);
-      transition: all 0.2s ease;
+      font-family: var(--font-mono);
     }
 
     .scenario-btn:hover {
-      background: rgba(0, 242, 254, 0.15);
-      border-color: var(--soc-cyan);
-      color: #FFFFFF;
-      transform: translateY(-1px);
+      border-color: var(--text-muted);
+      color: var(--text-bright);
     }
 
-    /* Engine Selector */
-    .engine-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 600px) {
-      .engine-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .engine-card {
-      background: #070D1E;
-      border: 1.5px solid var(--soc-card-border);
-      border-radius: 6px;
-      padding: 12px 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .engine-card:hover {
-      border-color: var(--soc-blue);
-    }
-
-    .engine-card.selected {
-      border-color: var(--soc-cyan);
-      background: rgba(0, 242, 254, 0.05);
-      box-shadow: 0 0 14px rgba(0, 242, 254, 0.12);
-    }
-
-    .engine-card input[type="radio"] {
-      margin-top: 3px;
-      accent-color: var(--soc-cyan);
-      cursor: pointer;
-    }
-
-    .engine-card-text .title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin-bottom: 2px;
-    }
-
-    .engine-card-text .desc {
-      font-size: 11px;
-      color: var(--soc-text-dim);
-      line-height: 1.35;
-    }
-
-    /* Warning Notice */
-    .soc-notice {
-      display: none;
-      margin-top: 14px;
-      padding: 12px 16px;
-      background: var(--soc-warning-bg);
-      border: 1px solid var(--soc-warning);
-      border-left: 4px solid var(--soc-warning);
-      border-radius: 6px;
-      font-size: 12.5px;
-      color: #FFD54F;
-      font-family: var(--soc-mono);
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease;
-    }
-
-    /* Submit Button */
+    /* Run Button */
     .btn-submit {
       width: 100%;
-      margin-top: 18px;
-      padding: 16px;
-      background: linear-gradient(90deg, #1B2A5B 0%, #1E3A8A 50%, #1B2A5B 100%);
-      background-size: 200% auto;
-      border: 1.5px solid var(--soc-cyan);
-      border-radius: 6px;
-      color: #FFFFFF;
-      font-family: var(--soc-mono);
-      font-size: 15px;
+      padding: 13px;
+      background: #21262D;
+      border: 1px solid #30363D;
+      color: var(--text-bright);
+      font-family: var(--font-mono);
+      font-size: 13px;
       font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.2);
-      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
+      text-align: center;
     }
 
     .btn-submit:hover {
-      background-position: right center;
-      box-shadow: 0 6px 26px rgba(0, 242, 254, 0.4);
-      transform: translateY(-1px);
+      background: #30363D;
+      border-color: #8B949E;
     }
 
     .btn-submit:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
-      border-color: #475569;
-      box-shadow: none;
     }
 
-    /* Live Scanning Telemetry Stream */
+    /* Telemetry Stream */
     .scan-stream {
       display: none;
       margin-top: 20px;
-      background: #050A18;
-      border: 1px solid #1E293B;
-      border-radius: 6px;
-      padding: 14px 18px;
-      font-family: var(--soc-mono);
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 12px 16px;
+      font-family: var(--font-mono);
       font-size: 12px;
-      color: var(--soc-cyan);
-      line-height: 1.6;
+      color: var(--text-main);
     }
 
     .scan-line {
@@ -389,11 +332,10 @@
 
     .scan-spinner {
       display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--soc-cyan);
-      border-top-color: transparent;
-      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--text-muted);
+      border-top-color: var(--text-bright);
       animation: spin 0.6s linear infinite;
     }
 
@@ -404,109 +346,55 @@
     /* Results Workbench */
     .results-workbench {
       display: none;
-      margin-top: 30px;
+      margin-top: 24px;
+      border-top: 1px solid var(--panel-border);
       padding-top: 24px;
-      border-top: 1px solid var(--soc-card-border);
-      animation: fadeIn 0.4s ease-out;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* SOC Command Navigation Menu */
+    /* Console Mode Nav Tabs */
     .soc-nav-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 768px) {
       .soc-nav-bar {
         grid-template-columns: 1fr 1fr;
       }
     }
 
-    @media (max-width: 520px) {
-      .soc-nav-bar {
-        grid-template-columns: 1fr;
-      }
-    }
-
     .soc-nav-card {
-      background: #070D1E;
-      border: 1.5px solid var(--soc-card-border);
-      border-radius: 8px;
-      padding: 16px 16px 14px 16px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 10px 12px;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      position: relative;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
       text-align: left;
-      min-height: 90px;
+      font-family: var(--font-mono);
     }
 
     .soc-nav-card:hover {
-      border-color: var(--soc-blue);
-      transform: translateY(-2px);
-      background: #0A132C;
+      border-color: var(--text-muted);
     }
 
     .soc-nav-card.active {
-      border-color: var(--soc-cyan);
-      background: linear-gradient(160deg, rgba(0, 242, 254, 0.1) 0%, rgba(14, 24, 56, 0.95) 100%);
-      box-shadow: 0 0 18px rgba(0, 242, 254, 0.2);
-    }
-
-    .nav-card-icon {
-      font-size: 22px;
-      margin-bottom: 10px;
-      line-height: 1;
+      border-color: var(--text-bright);
+      background: #161B22;
     }
 
     .nav-card-index {
-      font-family: var(--soc-mono);
-      font-size: 9.5px;
-      font-weight: 700;
-      color: var(--soc-text-dim);
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-
-    .soc-nav-card.active .nav-card-index {
-      color: var(--soc-cyan);
+      font-size: 10px;
+      color: var(--text-muted);
+      display: block;
     }
 
     .nav-card-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: #FFFFFF;
-      line-height: 1.35;
-    }
-
-    .nav-card-badge {
-      display: none;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-family: var(--soc-mono);
-      font-size: 8.5px;
-      font-weight: 800;
-      background: rgba(0, 242, 254, 0.15);
-      border: 1px solid var(--soc-cyan);
-      color: var(--soc-cyan);
-      padding: 2px 6px;
-      border-radius: 3px;
-      letter-spacing: 0.8px;
-    }
-
-    .soc-nav-card.active .nav-card-badge {
-      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-top: 2px;
+      display: block;
     }
 
     .tab-content {
@@ -515,136 +403,137 @@
 
     .tab-content.active {
       display: block;
-      animation: fadeIn 0.25s ease-out;
     }
 
-    /* Executive Verdict Card */
-    .verdict-card {
-      padding: 22px 24px;
-      border-radius: 8px;
-      margin-bottom: 18px;
+    /* Terminal Verdict Readout */
+    .verdict-box {
+      border: 1px solid var(--panel-border);
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #0D1117;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
-      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.4);
     }
 
-    .verdict-danger {
-      background: var(--soc-danger-bg);
-      border: 2px solid var(--soc-danger-border);
-      box-shadow: 0 0 24px rgba(255, 23, 68, 0.25);
+    .verdict-box.verdict-danger {
+      background: var(--threat-red-bg);
+      border-color: var(--threat-red-border);
     }
 
-    .verdict-safe {
-      background: var(--soc-safe-bg);
-      border: 2px solid var(--soc-safe-border);
-      box-shadow: 0 0 24px rgba(0, 230, 118, 0.2);
+    .verdict-box.verdict-safe {
+      background: var(--safe-green-bg);
+      border-color: var(--safe-green-border);
     }
 
-    .verdict-defused {
-      background: var(--soc-defused-bg);
-      border: 2px solid var(--soc-defused-border);
-      box-shadow: 0 0 24px rgba(0, 229, 255, 0.25);
+    .verdict-box.verdict-defused {
+      background: rgba(0, 216, 246, 0.08);
+      border-color: #005A70;
     }
 
-    .verdict-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .verdict-main-text {
+      text-align: left;
     }
 
-    .verdict-icon {
-      font-size: 32px;
-    }
-
-    .verdict-category-label {
-      font-size: 11px;
-      font-family: var(--soc-mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--soc-text-dim);
+    .verdict-status-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
     }
 
     .verdict-title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      font-family: var(--soc-mono);
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
     }
+
+    .color-danger { color: var(--threat-red); }
+    .color-safe { color: var(--safe-green); }
+    .color-defused { color: #00D8F6; }
 
     .verdict-sub-desc {
-      font-size: 12px;
-      color: #CBD5E1;
-      margin-top: 3px;
-      font-family: var(--soc-mono);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    .color-danger { color: var(--soc-danger); }
-    .color-safe { color: var(--soc-safe); }
-    .color-defused { color: var(--soc-defused); }
-
-    .verdict-right {
+    /* Motion: Risk Counter Animation */
+    .risk-score-wrapper {
       text-align: right;
-    }
-
-    .risk-score-label {
-      font-size: 11px;
-      font-family: var(--soc-mono);
-      text-transform: uppercase;
-      color: var(--soc-text-dim);
+      font-family: var(--font-mono);
     }
 
     .risk-score-percent {
-      font-size: 34px;
-      font-weight: 900;
-      font-family: var(--soc-mono);
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+      animation: scorePulse 0.4s ease-out;
     }
 
-    /* Score Comparison Bar */
+    @keyframes scorePulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .risk-meter-container {
+      width: 180px;
+      height: 8px;
+      background: #161B22;
+      border: 1px solid var(--panel-border);
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .risk-meter-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
+    }
+
+    /* Comparison Bar */
     .comparison-bar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px 16px;
-      background: #070D1E;
-      border: 1px solid var(--soc-card-border);
-      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 10px 14px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
       margin-bottom: 20px;
-      font-family: var(--soc-mono);
-      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .badge-pill {
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 11.5px;
+      font-size: 10.5px;
+      padding: 2px 6px;
+      font-weight: 600;
     }
 
     .badge-pill.raw-ml {
-      background: rgba(255, 23, 68, 0.15);
-      border: 1px solid rgba(255, 23, 68, 0.4);
-      color: #FF5252;
+      background: var(--threat-red-bg);
+      color: var(--threat-red);
+      border: 1px solid var(--threat-red-border);
     }
 
     .badge-pill.defused {
-      background: rgba(0, 229, 255, 0.15);
-      border: 1px solid var(--soc-cyan);
-      color: var(--soc-cyan);
+      background: var(--safe-green-bg);
+      color: var(--safe-green);
+      border: 1px solid var(--safe-green-border);
     }
 
-    /* Tactical Action Card */
+    /* Triage Guidance Box */
     .triage-action-card {
-      background: #091226;
-      border: 1px solid var(--soc-cyan);
-      border-left: 5px solid var(--soc-cyan);
-      border-radius: 6px;
-      padding: 16px 20px;
-      margin-bottom: 22px;
-      font-family: var(--soc-mono);
-      line-height: 1.5;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: left;
     }
 
     .triage-header-row {
@@ -655,172 +544,147 @@
     }
 
     .triage-title {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--soc-cyan);
-      letter-spacing: 0.8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
     .triage-chip {
-      font-size: 11px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
       font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 3px;
     }
 
-    .triage-chip.danger {
-      background: var(--soc-danger);
-      color: #FFFFFF;
-    }
-
-    .triage-chip.safe {
-      background: var(--soc-safe);
-      color: #070D1E;
-    }
-
-    .triage-chip.warning {
-      background: var(--soc-warning);
-      color: #070D1E;
-    }
+    .triage-chip.danger { background: var(--threat-red-bg); color: var(--threat-red); border: 1px solid var(--threat-red-border); }
+    .triage-chip.safe { background: var(--safe-green-bg); color: var(--safe-green); border: 1px solid var(--safe-green-border); }
+    .triage-chip.warning { background: var(--warning-amber-bg); color: #FCD34D; border: 1px solid var(--warning-amber-border); }
 
     .triage-body {
       font-size: 13px;
-      color: #E2E8F0;
+      color: var(--text-main);
     }
 
-    /* Radar / Vector Bars */
-    .radar-matrix {
+    /* Diagnostic Readout Grid */
+    .anatomy-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
     }
 
-    @media (max-width: 600px) {
-      .radar-matrix {
+    @media (max-width: 768px) {
+      .anatomy-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .anatomy-grid {
         grid-template-columns: 1fr;
       }
     }
 
+    .anatomy-card {
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .anatomy-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .anatomy-val {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-bright);
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    /* Multi-vector Threat Matrix */
+    .radar-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
     .radar-box {
-      background: #070D1E;
-      border: 1px solid var(--soc-card-border);
-      border-radius: 6px;
-      padding: 12px 16px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 12px 14px;
+      text-align: left;
     }
 
     .radar-title-row {
       display: flex;
       justify-content: space-between;
+      font-family: var(--font-mono);
       font-size: 11px;
-      font-family: var(--soc-mono);
-      color: var(--soc-text-dim);
-      text-transform: uppercase;
+      color: var(--text-muted);
       margin-bottom: 6px;
     }
 
     .radar-score-num {
+      color: var(--text-bright);
       font-weight: 700;
-      color: #FFFFFF;
     }
 
     .radar-track {
-      width: 100%;
-      height: 8px;
-      background: #111C3A;
-      border-radius: 4px;
+      height: 6px;
+      background: #161B22;
+      border: 1px solid var(--panel-border);
       overflow: hidden;
     }
 
     .radar-bar {
       height: 100%;
-      border-radius: 4px;
-      transition: width 0.6s ease;
+      transition: width 0.4s ease;
     }
 
-    /* Anatomy Grid */
-    .anatomy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .anatomy-card {
-      background: #070D1E;
-      border: 1px solid var(--soc-card-border);
-      border-radius: 6px;
-      padding: 12px;
-    }
-
-    .anatomy-label {
-      font-size: 10px;
-      font-family: var(--soc-mono);
-      color: var(--soc-text-dim);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .anatomy-val {
-      font-size: 12.5px;
-      font-family: var(--soc-mono);
-      color: #FFFFFF;
-      font-weight: 700;
-      word-break: break-all;
-    }
-
-    /* Signals / Feature Table */
+    /* Monospace Log Diagnostic Readout Tables */
     .signals-table {
       width: 100%;
       border-collapse: collapse;
-      font-family: var(--soc-mono);
+      font-family: var(--font-mono);
       font-size: 12px;
-      background: #070D1E;
-      border: 1px solid var(--soc-card-border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 24px;
+      margin-top: 10px;
+      text-align: left;
     }
 
     .signals-table th {
-      background: #0B142E;
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 11px;
-      color: var(--soc-cyan);
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--soc-card-border);
+      background: #0D1117;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 8px 12px;
+      border: 1px solid var(--panel-border);
+      font-size: 10.5px;
     }
 
     .signals-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid rgba(27, 46, 96, 0.4);
-      color: #E2E8F0;
-    }
-
-    .signals-table tr:hover {
-      background: rgba(0, 242, 254, 0.04);
+      padding: 8px 12px;
+      border: 1px solid var(--panel-border);
+      background: #0D1117;
+      color: var(--text-main);
     }
 
     .val-chip {
-      background: #111C3A;
-      border: 1px solid #1B2E60;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-weight: 700;
-      color: #FFFFFF;
+      color: var(--text-bright);
+      font-weight: 600;
     }
 
-    /* IOC & Incident Response */
+    /* IOC Code Boxes */
     .ioc-box {
-      background: #070D1E;
-      border: 1px solid var(--soc-card-border);
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 14px;
-      font-family: var(--soc-mono);
-      font-size: 12.5px;
+      background: #0D1117;
+      border: 1px solid var(--panel-border);
+      padding: 14px;
+      margin-top: 10px;
+      text-align: left;
     }
 
     .ioc-header-row {
@@ -831,242 +695,216 @@
     }
 
     .ioc-title {
+      font-family: var(--font-mono);
       font-size: 11px;
-      color: var(--soc-cyan);
-      text-transform: uppercase;
-      font-weight: 700;
+      color: var(--text-muted);
     }
 
     .btn-copy {
-      background: rgba(0, 242, 254, 0.1);
-      border: 1px solid var(--soc-cyan);
-      color: var(--soc-cyan);
-      font-family: var(--soc-mono);
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 4px;
+      background: #161B22;
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
     .btn-copy:hover {
-      background: var(--soc-cyan);
-      color: #070D1E;
+      border-color: var(--text-muted);
+      color: var(--text-bright);
     }
 
     .ioc-code {
-      background: #040813;
-      border: 1px solid #14224A;
-      padding: 10px 12px;
-      border-radius: 4px;
-      color: #38BDF8;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-bright);
       word-break: break-all;
     }
 
     .json-preview {
       width: 100%;
       height: 180px;
-      background: #040813;
-      border: 1px solid #14224A;
-      border-radius: 4px;
-      padding: 12px;
-      color: #A5F3FC;
-      font-family: var(--soc-mono);
+      background: #0B0E14;
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      font-family: var(--font-mono);
       font-size: 11px;
+      padding: 10px;
+      outline: none;
       resize: vertical;
     }
 
-    /* Footer */
-    .footer {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 12px;
-      font-family: var(--soc-mono);
-      color: #64748B;
+    /* Console Footer */
+    .console-footer {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-top: none;
+      padding: 12px 24px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: left;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Top Telemetry HUD -->
-    <div class="top-telemetry-bar">
-      <div class="telemetry-left">
-        <div class="pulse-orb"></div>
-        <span>SOC-NODE-01 // ACTIVE SURVEILLANCE</span>
-      </div>
-      <div class="telemetry-right">
-        <span>ENGINE: <span class="telemetry-highlight">HYBRID DEFUSER v3.2</span></span>
-        <span>LATENCY: <span class="telemetry-highlight">&lt; 4ms</span></span>
-        <span>IOC FEEDS: <span class="telemetry-highlight">VRBANCIC (88K) + WHOIS</span></span>
-      </div>
+  <!-- Top Telemetry Header Bar -->
+  <div class="top-telemetry-bar">
+    <div class="telemetry-left">
+      <span class="status-indicator"></span>
+      <span>SOC ENGINE // DEFUSER v2.4</span>
     </div>
+    <div class="telemetry-right">
+      <div class="telemetry-item">MODEL: <span>Random Forest (16 Signals)</span></div>
+      <div class="telemetry-item">STATUS: <span>ACTIVE</span></div>
+    </div>
+  </div>
 
-    <!-- Main Console Header -->
+  <!-- Main Console Area -->
+  <div class="console-wrapper">
+    
+    <!-- Console Header -->
     <div class="console-header">
-      <div class="header-layout">
+      <div class="header-title-row">
         <div class="header-title-box">
-          <h1>
-            <span>🛡️ AI MALICIOUS LINK DEFUSER</span>
-          </h1>
-          <p>Enterprise Threat Intelligence &amp; Multi-Tiered Link Defusal Workbench</p>
+          <h1>[ SOC Threat Diagnostic Console ]</h1>
+          <p>Malicious URL Defusal &amp; Lexical Feature Breakdown</p>
         </div>
-        <div class="header-meta-tags">
-          <div class="meta-chip">CYBER DEFENSE LAB</div>
-          <div class="meta-chip">XAI FORENSICS</div>
+        <div class="header-tags">
+          <span class="console-tag">ML ENSEMBLE</span>
+          <span class="console-tag">DNS VERIFIER</span>
         </div>
       </div>
     </div>
 
-    <!-- Main Panel -->
-    <div class="main-panel">
+    <!-- Continuous Output Console Panel -->
+    <div class="continuous-panel">
+      
       <form id="checkForm">
-        <div class="form-group">
-          <div class="field-label">
-            <span>Target Link To Defuse</span>
-            <span style="color: var(--soc-cyan);">LEXICAL + REPUTATION + DNS VERIFICATION</span>
-          </div>
-          <div class="input-wrapper">
-            <span class="input-prefix">TARGET://</span>
-            <input
-              type="text"
-              id="urlInput"
-              name="url"
-              placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-              value="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-              required
-              autocomplete="off"
-            />
-          </div>
-
-          <div class="scenarios-bar">
-            <span class="scenarios-label">Fast Scenarios:</span>
-            <button type="button" class="scenario-btn" onclick="setUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ')">🎥 YouTube (Defused Bias)</button>
-            <button type="button" class="scenario-btn" onclick="setUrl('http://youtube.com.login-verify.xyz/update')">🚨 Brand Spoofing</button>
-            <button type="button" class="scenario-btn" onclick="setUrl('http://bit.ly/free-prize-claim-now')">⚡ Shortener Phish</button>
-            <button type="button" class="scenario-btn" onclick="setUrl('http://192.168.1.1/login.php?user=admin&token=xyz')">🛑 Direct IP Trap</button>
-            <button type="button" class="scenario-btn" onclick="setUrl('https://en.wikipedia.org/wiki/Machine_learning')">📚 Wikipedia Deep Path</button>
-          </div>
+        <!-- Input Field -->
+        <span class="section-label">// TARGET URL INPUT</span>
+        <div class="input-row">
+          <span class="input-prefix">URL&gt;</span>
+          <input type="text" id="urlInput" placeholder="https://example-phishing-login.xyz/auth/verify" required autocomplete="off" spellcheck="false">
         </div>
 
-        <div class="form-group">
-          <div class="field-label">
-            <span>Defusal Engine Architecture</span>
-          </div>
-          <div class="engine-grid">
-            <label class="engine-card selected" id="cardBaseline">
-              <input type="radio" name="modelChoice" value="baseline" checked>
-              <div class="engine-card-text">
-                <div class="title">Enterprise Hybrid Defuser (Active)</div>
-                <div class="desc">Combines Random Forest (16 lexical features) with Domain Authority verification, anti-spoofing, and live DNS resolution.</div>
-              </div>
-            </label>
-
-            <label class="engine-card" id="cardRefined">
-              <input type="radio" name="modelChoice" value="refined">
-              <div class="engine-card-text">
-                <div class="title">Refined Model (111 Full Features)</div>
-                <div class="desc">Dataset-bound model requiring offline WHOIS/DNS/TLS attributes not available in live demo.</div>
-              </div>
-            </label>
-          </div>
+        <!-- Quick Scenarios -->
+        <div class="scenarios-bar">
+          <span class="scenarios-label">// QUICK TEST LOAD:</span>
+          <button type="button" class="scenario-btn" onclick="setUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ')">Defused Authority (YouTube)</button>
+          <button type="button" class="scenario-btn" onclick="setUrl('http://youtube.com-verify-account.xyz/login.php')">Brand Spoofing (Phishing)</button>
+          <button type="button" class="scenario-btn" onclick="setUrl('http://192.168.1.1/admin/config.php')">Direct IP Host</button>
+          <button type="button" class="scenario-btn" onclick="setUrl('https://bit.ly/3xY8zQp')">Shortened Obfuscation</button>
         </div>
 
-        <div id="inlineNotice" class="soc-notice">
-          ⚠️ <strong>TELEMETRY NOTICE:</strong> Refined model needs WHOIS/DNS lookups not available in this live demo — showing baseline prediction instead.
+        <!-- Engine Selector -->
+        <span class="section-label">// CLASSIFICATION MODEL SELECTION</span>
+        <div class="engine-grid">
+          <label class="engine-card selected" id="cardBaseline">
+            <input type="radio" name="modelChoice" value="baseline" checked>
+            <div class="engine-card-text">
+              <div class="title">Baseline Random Forest</div>
+              <div class="desc">16 lexical URL structural features trained on global Tranco &amp; OpenPhish datasets.</div>
+            </div>
+          </label>
+
+          <label class="engine-card" id="cardRefined">
+            <input type="radio" name="modelChoice" value="refined">
+            <div class="engine-card-text">
+              <div class="title">Refined Model (Enhanced Signals)</div>
+              <div class="desc">Includes WHOIS domain age &amp; live network response vectors.</div>
+            </div>
+          </label>
         </div>
 
-        <button type="submit" id="submitBtn" class="btn-submit">
-          <span>⚡ INITIATE THREAT SCAN &amp; DEFUSE</span>
-        </button>
+        <!-- Notice Container -->
+        <div id="inlineNotice" class="soc-notice"></div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="btn-submit">[ RUN DIAGNOSTIC SCAN ]</button>
       </form>
 
-      <!-- Live Scan Terminal Stream -->
+      <!-- Live Scan Telemetry Stream -->
       <div id="scanStream" class="scan-stream">
         <div class="scan-line">
-          <div class="scan-spinner"></div>
-          <span id="scanLogText">Extracting lexical vector &amp; checking domain hierarchy...</span>
+          <span class="scan-spinner"></span>
+          <span id="scanLogText">Initializing ML lexical engine &amp; DNS resolution...</span>
         </div>
       </div>
 
-      <!-- Results Workbench -->
+      <!-- Results Output Panel (Continuous Output Stream) -->
       <div id="resultsWorkbench" class="results-workbench">
         
-        <!-- SOC Command Navigation Menu -->
-        <nav class="soc-nav-bar" id="socNavBar">
+        <!-- Navigation Modes -->
+        <span class="section-label">// CONSOLE MODE SELECT</span>
+        <nav class="soc-nav-bar">
           <button type="button" class="soc-nav-card active" data-tab="tab-overview" onclick="selectNavTab('tab-overview', this)">
-            <span class="nav-card-badge">ACTIVE</span>
-            <div class="nav-card-icon">🛡️</div>
-            <span class="nav-card-index">01 // ASSESSMENT</span>
-            <span class="nav-card-title">Executive Threat Assessment</span>
+            <span class="nav-card-index">MODE 01</span>
+            <span class="nav-card-title">Threat Assessment</span>
           </button>
 
           <button type="button" class="soc-nav-card" data-tab="tab-radar" onclick="selectNavTab('tab-radar', this)">
-            <span class="nav-card-badge">ACTIVE</span>
-            <div class="nav-card-icon">📊</div>
-            <span class="nav-card-index">02 // DECOMPOSITION</span>
-            <span class="nav-card-title">Threat Vector Decomposition</span>
+            <span class="nav-card-index">MODE 02</span>
+            <span class="nav-card-title">Vector Decomposition</span>
           </button>
 
           <button type="button" class="soc-nav-card" data-tab="tab-sensors" onclick="selectNavTab('tab-sensors', this)">
-            <span class="nav-card-badge">ACTIVE</span>
-            <div class="nav-card-icon">🔬</div>
-            <span class="nav-card-index">03 // FORENSICS</span>
-            <span class="nav-card-title">Deep 16-Sensor Forensics</span>
+            <span class="nav-card-index">MODE 03</span>
+            <span class="nav-card-title">16-Vector Log</span>
           </button>
 
           <button type="button" class="soc-nav-card" data-tab="tab-ioc" onclick="selectNavTab('tab-ioc', this)">
-            <span class="nav-card-badge">ACTIVE</span>
-            <div class="nav-card-icon">🚨</div>
-            <span class="nav-card-index">04 // INCIDENT</span>
-            <span class="nav-card-title">Incident Response &amp; IOCs</span>
+            <span class="nav-card-index">MODE 04</span>
+            <span class="nav-card-title">IOC &amp; Incident JSON</span>
           </button>
         </nav>
 
-        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <!-- MODE 1: ASSESSMENT OVERVIEW -->
         <div id="tab-overview" class="tab-content active">
           
-          <!-- Verdict Card -->
-          <div id="verdictCard" class="verdict-card verdict-safe">
-            <div class="verdict-left">
-              <span id="verdictIcon" class="verdict-icon">🛡️</span>
-              <div>
-                <div class="verdict-category-label">CLASSIFICATION VERDICT</div>
-                <div id="verdictTitle" class="verdict-title color-safe">LIKELY SAFE</div>
-                <div id="threatClass" class="verdict-sub-desc">Verified Benign Platform &bull; MITRE ATT&CK: BENIGN</div>
-              </div>
+          <!-- Terminal Verdict Box -->
+          <div id="verdictCard" class="verdict-box verdict-safe">
+            <div class="verdict-main-text">
+              <div class="verdict-status-tag">// CLASSIFICATION VERDICT</div>
+              <div id="verdictTitle" class="verdict-title color-safe">LIKELY SAFE</div>
+              <div id="threatClass" class="verdict-sub-desc">Verified Benign Platform &bull; MITRE ATT&amp;CK: BENIGN</div>
             </div>
-            <div class="verdict-right">
-              <div class="risk-score-label">DEFUSED THREAT RISK</div>
+            <div class="risk-score-wrapper">
+              <div class="verdict-status-tag">// THREAT RISK SCORE</div>
               <div id="riskScorePercent" class="risk-score-percent color-safe">2.2%</div>
+              <div class="risk-meter-container">
+                <div id="riskMeterBar" class="risk-meter-bar"></div>
+              </div>
             </div>
           </div>
 
-          <!-- Score Comparison Pill -->
+          <!-- Score Comparison Bar -->
           <div class="comparison-bar">
             <div>
-              <span style="color: var(--soc-text-dim);">RAW LEXICAL ML MODEL:</span> 
-              <span id="rawMlBadge" class="badge-pill raw-ml">87.5% RAW SCORE</span>
+              <span style="color: var(--text-muted);">RAW ML MODEL:</span> 
+              <span id="rawMlBadge" class="badge-pill raw-ml">87.5% RAW</span>
             </div>
             <div>
-              <span style="color: var(--soc-text-dim);">HYBRID DEFUSER ENGINE:</span> 
+              <span style="color: var(--text-muted);">HYBRID DEFUSER:</span> 
               <span id="defusedBadge" class="badge-pill defused">DEFUSED TO 2.2%</span>
             </div>
           </div>
 
-          <!-- Actionable SOC Triage Guidance -->
+          <!-- Triage Guidance -->
           <div class="triage-action-card">
             <div class="triage-header-row">
-              <span class="triage-title">RECOMMENDED SOC TRIAGE ACTION</span>
+              <span class="triage-title">// RECOMMENDED TRIAGE ACTION</span>
               <span id="triageChip" class="triage-chip safe">PERMIT / TRUSTED</span>
             </div>
             <div class="triage-body" id="triageText">
-              Platform identity validated. Safe for unrestricted endpoint access without quarantine.
+              Platform identity validated. Safe for unrestricted endpoint access.
             </div>
           </div>
 
           <!-- Link Anatomy Dissector -->
-          <div class="field-label" style="margin-top: 24px;">TARGET LINK ANATOMY &amp; NETWORK TELEMETRY</div>
+          <span class="section-label" style="margin-top: 20px;">// NETWORK TELEMETRY &amp; LINK ANATOMY</span>
           <div class="anatomy-grid">
             <div class="anatomy-card">
               <div class="anatomy-label">PROTOCOL</div>
@@ -1085,7 +923,7 @@
               <div class="anatomy-val" id="anatPath">/watch</div>
             </div>
             <div class="anatomy-card">
-              <div class="anatomy-label">QUERY PARAMETERS</div>
+              <div class="anatomy-label">QUERY PARAMS</div>
               <div class="anatomy-val" id="anatQuery">v=dQw4w9WgXcQ</div>
             </div>
             <div class="anatomy-card">
@@ -1095,9 +933,9 @@
           </div>
         </div>
 
-        <!-- TAB 2: THREAT RADAR DECOMPOSITION -->
+        <!-- MODE 2: VECTOR DECOMPOSITION -->
         <div id="tab-radar" class="tab-content">
-          <div class="field-label">MULTI-VECTOR THREAT RISK DECOMPOSITION</div>
+          <span class="section-label">// MULTI-VECTOR THREAT DECOMPOSITION MATRIX</span>
           <div class="radar-matrix">
             <div class="radar-box">
               <div class="radar-title-row">
@@ -1105,7 +943,7 @@
                 <span id="radarLexicalVal" class="radar-score-num">87.5%</span>
               </div>
               <div class="radar-track">
-                <div id="radarLexicalBar" class="radar-bar" style="width: 87.5%; background: var(--soc-danger);"></div>
+                <div id="radarLexicalBar" class="radar-bar" style="width: 87.5%; background: var(--threat-red);"></div>
               </div>
             </div>
 
@@ -1115,7 +953,7 @@
                 <span id="radarBrandVal" class="radar-score-num">0.0%</span>
               </div>
               <div class="radar-track">
-                <div id="radarBrandBar" class="radar-bar" style="width: 0%; background: var(--soc-danger);"></div>
+                <div id="radarBrandBar" class="radar-bar" style="width: 0%; background: var(--threat-red);"></div>
               </div>
             </div>
 
@@ -1125,7 +963,7 @@
                 <span id="radarInfraVal" class="radar-score-num">5.0%</span>
               </div>
               <div class="radar-track">
-                <div id="radarInfraBar" class="radar-bar" style="width: 5%; background: var(--soc-warning);"></div>
+                <div id="radarInfraBar" class="radar-bar" style="width: 5%; background: var(--warning-amber);"></div>
               </div>
             </div>
 
@@ -1135,20 +973,20 @@
                 <span id="radarTrustVal" class="radar-score-num">98.0%</span>
               </div>
               <div class="radar-track">
-                <div id="radarTrustBar" class="radar-bar" style="width: 98%; background: var(--soc-safe);"></div>
+                <div id="radarTrustBar" class="radar-bar" style="width: 98%; background: var(--safe-green);"></div>
               </div>
             </div>
           </div>
 
-          <!-- Top 3 Contributing Signals -->
-          <div class="field-label" style="margin-top: 24px;">TOP 3 CONTRIBUTING MACHINE LEARNING SIGNALS</div>
+          <!-- Top Contributing Signals Readout -->
+          <span class="section-label" style="margin-top: 20px;">// TOP CONTRIBUTING ML SIGNALS DIAGNOSTIC LOG</span>
           <table class="signals-table">
             <thead>
               <tr>
-                <th>Signal Name</th>
-                <th>Global Model Weight</th>
-                <th>Extracted Value for URL</th>
-                <th>Analyst Description</th>
+                <th>SIGNAL KEY</th>
+                <th>MODEL WEIGHT</th>
+                <th>VALUE</th>
+                <th>ANALYST DESCRIPTION</th>
               </tr>
             </thead>
             <tbody id="topSignalsBody">
@@ -1157,16 +995,16 @@
           </table>
         </div>
 
-        <!-- TAB 3: DEEP 16 SENSORS FORENSICS -->
+        <!-- MODE 3: 16-VECTOR LOG READOUT -->
         <div id="tab-sensors" class="tab-content">
-          <div class="field-label">COMPLETE 16-DIMENSIONAL LEXICAL VECTOR FORENSICS</div>
+          <span class="section-label">// 16-DIMENSIONAL LEXICAL VECTOR DIAGNOSTIC READOUT</span>
           <table class="signals-table">
             <thead>
               <tr>
-                <th>Feature Key</th>
-                <th>Value</th>
-                <th>Weight (%)</th>
-                <th>Tactical Explanation</th>
+                <th>FEATURE KEY</th>
+                <th>VALUE</th>
+                <th>WEIGHT (%)</th>
+                <th>TACTICAL EXPLANATION</th>
               </tr>
             </thead>
             <tbody id="allSensorsBody">
@@ -1175,14 +1013,14 @@
           </table>
         </div>
 
-        <!-- TAB 4: INCIDENT RESPONSE & DEFANGED IOCS -->
+        <!-- MODE 4: IOC & INCIDENT JSON -->
         <div id="tab-ioc" class="tab-content">
-          <div class="field-label">SECURITY INCIDENT RESPONSE // INDICATORS OF COMPROMISE (IOCS)</div>
+          <span class="section-label">// INDICATORS OF COMPROMISE (IOCS) &amp; REPORT DATA</span>
 
           <!-- Defanged URL -->
           <div class="ioc-box">
             <div class="ioc-header-row">
-              <span class="ioc-title">DEFANGED URL (SAFE FOR TICKETS &amp; SOC CHAT)</span>
+              <span class="ioc-title">DEFANGED URL (SAFE FOR INCIDENT TICKETS)</span>
               <button type="button" class="btn-copy" onclick="copyText('defangedUrlText', this)">Copy Defanged</button>
             </div>
             <div class="ioc-code" id="defangedUrlText">hxxps[://]www[.]youtube[.]com/watch?v=dQw4w9WgXcQ</div>
@@ -1200,7 +1038,7 @@
           <!-- Raw JSON IOC Report -->
           <div class="ioc-box">
             <div class="ioc-header-row">
-              <span class="ioc-title">RAW THREAT INTELLIGENCE JSON REPORT</span>
+              <span class="ioc-title">RAW THREAT INTELLIGENCE JSON</span>
               <button type="button" class="btn-copy" onclick="copyJson(this)">Copy JSON</button>
             </div>
             <textarea class="json-preview" id="jsonPreview" readonly></textarea>
@@ -1210,9 +1048,9 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      AI Powered Malicious Link Defuser &bull; PBL Machine Learning &bull; Enterprise SOC Edition
+    <!-- Console Footer -->
+    <div class="console-footer">
+      ML Malicious Link Defuser Console &bull; Security Analytics &bull; Project Assessment Edition
     </div>
   </div>
 
@@ -1227,7 +1065,7 @@
     const inlineNotice = document.getElementById('inlineNotice');
     const resultsWorkbench = document.getElementById('resultsWorkbench');
 
-    // Engine Radio Selection
+    // Engine Selection
     const cardBaseline = document.getElementById('cardBaseline');
     const cardRefined = document.getElementById('cardRefined');
     const radioInputs = document.querySelectorAll('input[name="modelChoice"]');
@@ -1237,6 +1075,7 @@
         if (radio.value === 'refined') {
           cardRefined.classList.add('selected');
           cardBaseline.classList.remove('selected');
+          inlineNotice.innerHTML = `[!] TELEMETRY NOTICE: Refined model needs WHOIS/DNS lookups not available in this live demo — showing baseline prediction instead.`;
           inlineNotice.style.display = 'block';
         } else {
           cardBaseline.classList.add('selected');
@@ -1271,7 +1110,7 @@
       const text = document.getElementById(elementId).textContent;
       navigator.clipboard.writeText(text).then(() => {
         const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
+        btn.textContent = 'COPIED';
         setTimeout(() => { btn.textContent = originalText; }, 1500);
       });
     }
@@ -1280,7 +1119,7 @@
       const text = document.getElementById('jsonPreview').value;
       navigator.clipboard.writeText(text).then(() => {
         const originalText = btn.textContent;
-        btn.textContent = 'Copied JSON!';
+        btn.textContent = 'COPIED JSON';
         setTimeout(() => { btn.textContent = originalText; }, 1500);
       });
     }
@@ -1328,9 +1167,9 @@
         setTimeout(() => {
           clearInterval(scanInterval);
           scanStream.style.display = 'none';
-          renderExpertWorkbench(data, selectedModel);
+          renderConsoleWorkbench(data, selectedModel);
           submitBtn.disabled = false;
-        }, 550);
+        }, 500);
 
       } catch (err) {
         clearInterval(scanInterval);
@@ -1340,13 +1179,13 @@
       }
     });
 
-    function renderExpertWorkbench(data, selectedModel) {
+    function renderConsoleWorkbench(data, selectedModel) {
       resultsWorkbench.style.display = 'block';
       selectNavTab('tab-overview');
 
       // Inline note
       if (data.note) {
-        inlineNotice.innerHTML = `⚠️ <strong>TELEMETRY NOTICE:</strong> ${data.note}`;
+        inlineNotice.innerHTML = `[!] TELEMETRY NOTICE: ${data.note}`;
         inlineNotice.style.display = 'block';
       } else if (selectedModel !== 'refined') {
         inlineNotice.style.display = 'none';
@@ -1359,41 +1198,42 @@
       const rawMl = data.raw_ml_score || 0;
 
       const verdictCard = document.getElementById('verdictCard');
-      const verdictIcon = document.getElementById('verdictIcon');
       const verdictTitle = document.getElementById('verdictTitle');
       const threatClass = document.getElementById('threatClass');
       const riskScorePercent = document.getElementById('riskScorePercent');
+      const riskMeterBar = document.getElementById('riskMeterBar');
       const rawMlBadge = document.getElementById('rawMlBadge');
       const defusedBadge = document.getElementById('defusedBadge');
 
       riskScorePercent.textContent = score.toFixed(1) + '%';
+      riskMeterBar.style.width = Math.min(100, Math.max(0, score)) + '%';
       rawMlBadge.textContent = `${rawMl.toFixed(1)}% RAW ML`;
 
       const mitreTag = data.mitre ? `MITRE ATT&CK: ${data.mitre.id} (${data.mitre.name})` : '';
       threatClass.textContent = `${data.threat_class || 'Standard Analysis'} • ${mitreTag}`;
 
       if (isDefused) {
-        verdictCard.className = 'verdict-card verdict-defused';
-        verdictIcon.textContent = '🛡️';
+        verdictCard.className = 'verdict-box verdict-defused';
         verdictTitle.textContent = 'LIKELY SAFE (DEFUSED FALSE-POSITIVE)';
         verdictTitle.className = 'verdict-title color-defused';
         riskScorePercent.className = 'risk-score-percent color-defused';
+        riskMeterBar.style.background = '#00D8F6';
         defusedBadge.textContent = `DEFUSED TO ${score.toFixed(1)}% (SAFE)`;
         defusedBadge.className = 'badge-pill defused';
       } else if (isDanger) {
-        verdictCard.className = 'verdict-card verdict-danger';
-        verdictIcon.textContent = '🚨';
+        verdictCard.className = 'verdict-box verdict-danger';
         verdictTitle.textContent = data.verdict.toUpperCase();
         verdictTitle.className = 'verdict-title color-danger';
         riskScorePercent.className = 'risk-score-percent color-danger';
+        riskMeterBar.style.background = 'var(--threat-red)';
         defusedBadge.textContent = `CONFIRMED THREAT ${score.toFixed(1)}%`;
         defusedBadge.className = 'badge-pill raw-ml';
       } else {
-        verdictCard.className = 'verdict-card verdict-safe';
-        verdictIcon.textContent = '✅';
+        verdictCard.className = 'verdict-box verdict-safe';
         verdictTitle.textContent = data.verdict.toUpperCase();
         verdictTitle.className = 'verdict-title color-safe';
         riskScorePercent.className = 'risk-score-percent color-safe';
+        riskMeterBar.style.background = 'var(--safe-green)';
         defusedBadge.textContent = `EVALUATED ${score.toFixed(1)}% (SAFE)`;
         defusedBadge.className = 'badge-pill defused';
       }
@@ -1439,7 +1279,7 @@
         data.top_features.forEach(feat => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td style="color:var(--soc-cyan);font-weight:700;">${feat.name}</td>
+            <td style="color:var(--text-bright);font-weight:700;">${feat.name}</td>
             <td>${(feat.importance * 100).toFixed(1)}%</td>
             <td><span class="val-chip">${feat.value}</span></td>
             <td>${feat.description}</td>
@@ -1455,7 +1295,7 @@
         data.all_features.forEach(feat => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td style="color:var(--soc-cyan);font-weight:700;">${feat.name}</td>
+            <td style="color:var(--text-bright);font-weight:700;">${feat.name}</td>
             <td><span class="val-chip">${feat.value}</span></td>
             <td>${(feat.importance * 100).toFixed(1)}%</td>
             <td>${feat.description}</td>
