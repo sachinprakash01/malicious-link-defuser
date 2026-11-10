@@ -16,9 +16,6 @@ venv/
 # Dataset (too large)
 data/
 
-# Large model files only (keep baseline)
-models/rf_refined.joblib
-models/refined_features.joblib
 
 # Nested repo
 Malicious Link Difuser/

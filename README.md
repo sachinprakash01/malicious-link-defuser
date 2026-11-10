@@ -9,35 +9,48 @@ pip install scikit-learn pandas matplotlib joblib numpy --break-system-packages
 ## 2. Get the dataset
 Download the CSV into the `data/` folder:
 ```
-cd malicious_link_defuser/data
+cd data
 curl -L -o dataset_full.csv https://raw.githubusercontent.com/GregaVrbancic/Phishing-Dataset/master/dataset_full.csv
 ```
 (or just paste that URL into your browser and save the file there)
 
-## 3. Train both models
+## 3. Train the model
 ```
-cd ../src
-python3 train.py
+cd src
+python train.py
 ```
-This trains Iteration 1 (baseline) and Iteration 2 (refined), saves the models into
-`models/`, the evaluation figures into `figures/`, and prints + saves `results.json`.
-Takes under a minute for the baseline, a few minutes for the refined model
-(300 trees on 111 features) depending on your machine.
+This trains the baseline Random Forest model, saves it into `models/`, the evaluation figures into `figures/`, and prints + saves `results.json`.
 
-## 4. Try the live demo
-From the `src/` folder:
+## 4. Try the CLI demo
+From the repository root:
 ```
-python3 predict.py "http://some-suspicious-url.com/login?verify=1"
+python src/predict.py "http://some-suspicious-url.com/login?verify=1"
 ```
 Prints a verdict, a risk score, and the top features driving that decision.
 
+## 5. Run the web app
+From the repository root:
+```
+python src/app.py
+```
+Opens the SOC Web Console at `http://localhost:5000`.
+
+## 6. Deploy to Render
+- **Environment**: Python 3.11+
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `gunicorn src.app:app`
+- **Note**: Ensure `models/rf_baseline.joblib` and `models/baseline_features.joblib` are committed in the repository so the service starts immediately without retraining.
+
 ## Folder structure expected
 ```
-malicious_link_defuser/
-  data/dataset_full.csv      <- you download this (step 2)
-  models/                    <- created by train.py
-  figures/                   <- created by train.py
-  src/train.py
-  src/extract_features.py
-  src/predict.py
+data/dataset_full.csv      <- downloaded dataset
+models/                    <- trained baseline model & feature list
+figures/                   <- evaluation figures
+src/app.py                 <- Flask web app & SOC console
+src/train.py               <- training script
+src/extract_features.py    <- 16-feature lexical extractor
+src/predict.py             <- CLI prediction script
+src/templates/index.html   <- SOC dashboard UI
+tests/test_rules.py        <- test suite
+requirements.txt           <- pinned dependencies
 ```
